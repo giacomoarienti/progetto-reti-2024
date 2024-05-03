@@ -29,7 +29,7 @@ class Client():
             if not message:
                 raise ConnectionError
         except:
-            print("[!] Failed to receive the message")
+            print("[!] Connection to server lost")
             self.socket.close()
             exit(-1)
 
@@ -39,21 +39,19 @@ class Client():
     def send_data(self, message: str) -> None:
         try:
             # send the message to the server
-            self.socket.sendall(f"{self.name}: {message}".encode())
+            self.socket.sendall(message.encode())
         except:
             print("[!] Failed to send the message")
             self.socket.close()
             exit(-1)
 
-        print(f"{self.name}: {message}")
-
     def run(self) -> None:
         # connect to the server
         try:
             self.socket.connect(self.SERVER_ADDR)
+            self.socket.sendall(self.name.encode())
             print("[+] Connected to the server")
-        except Exception as e:
-            print(e)
+        except:
             print(f"[!] Failed to connect to the server {self.SERVER_ADDR}")
             exit(-1)
 
@@ -62,7 +60,7 @@ class Client():
 
         while True:
             try:
-                # Use select to check if there's data to read
+                # use select to check if there's data to read
                 # from stdin or from the server
                 inputs = [sys.stdin, self.socket]
                 readable, _, _ = select.select(inputs, [], [])
