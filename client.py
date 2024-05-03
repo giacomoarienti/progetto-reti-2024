@@ -9,17 +9,16 @@ BUF_SIZE = 1024
 class Client():
     EXIT = "exit"
 
-    def __init__(self, SERVER_ADDR) -> None:
+    def __init__(self, SERVER_ADDR: tuple, CLIENT_NAME: str) -> None:
         self.SERVER_ADDR = SERVER_ADDR
+        self.CLIENT_NAME = CLIENT_NAME
+
         # create an AF_INET, TCP socket
         self.socket = socket.socket(
             family=socket.AF_INET,
             type=socket.SOCK_STREAM,
             proto=socket.IPPROTO_TCP
         )
-
-        # get the name of the client
-        self.name = input("Enter your name: ")
 
     def receive_data(self) -> None:
         try:
@@ -49,7 +48,7 @@ class Client():
         # connect to the server
         try:
             self.socket.connect(self.SERVER_ADDR)
-            self.socket.sendall(self.name.encode())
+            self.socket.sendall(f"{self.CLIENT_NAME}".encode())
             print("[+] Connected to the server")
         except:
             print(f"[!] Failed to connect to the server {self.SERVER_ADDR}")
@@ -84,7 +83,12 @@ class Client():
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
-        SERVER_PORT = int(sys.argv[1])
+        name = sys.argv[1]
 
-    c = Client((SERVER_IP, SERVER_PORT))
+        if len(sys.argv) > 2:
+            SERVER_PORT = int(sys.argv[2])
+    else:
+        name = input("Enter your name: ")
+
+    c = Client((SERVER_IP, SERVER_PORT), name)
     c.run()
