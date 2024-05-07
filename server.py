@@ -31,7 +31,7 @@ class Server():
                 self._handle_error(sock)
 
     def _handle_error(self, sock: socket.socket) -> None:
-        print(f"[-] Connection to {self.connections.get(sock)} {sock.getpeername()} lost")
+        print(f"[-] Connection to {self.connections.get(sock)} lost")
 
         # remove the connection
         name = self.connections.get(sock)
