@@ -31,15 +31,16 @@ class Server():
                 self._handle_error(sock)
 
     def _handle_error(self, sock: socket.socket) -> None:
-        print(f"[-] Connection to {self.connections.get(sock)} lost")
+        name = self.connections.get(sock)
+        print(f"[-] Connection to {name} {sock.getpeername()} lost")
 
         # remove the connection
-        name = self.connections.get(sock)
         self.connections.pop(sock)
         sock.close()
 
         # announce the client left the chat
-        self._broadcast(f"[-] {name} left the chat".encode())
+        if name:
+            self._broadcast(f"[-] {name} left the chat".encode())
 
     def accept_connection(self) -> None:
         # Accept new connection
@@ -47,12 +48,7 @@ class Server():
             client_sock, client_addr = self.socket.accept()
             print(f"[+] New connection from {client_addr}")
 
-            # receive client name
-            client_name = client_sock.recv(BUF_SIZE).decode()
-            self.connections[client_sock] = client_name
-
-            # send message to all the clients
-            self._broadcast(f"[+] {client_name} joined the chat".encode())
+            self.connections[client_sock] = None
         except:
             print("[!] Failed to accept the connection")
 
@@ -65,6 +61,15 @@ class Server():
                 raise ConnectionError
         except:
             self._handle_error(sock)
+            return
+
+        # if no name is set for the client, set the name
+        if not self.connections.get(sock):
+            client_name = data.decode()
+            self.connections[sock] = client_name
+
+            # send message to all the clients
+            self._broadcast(f"[+] {client_name} joined the chat".encode())
             return
 
         name = self.connections.get(sock)
