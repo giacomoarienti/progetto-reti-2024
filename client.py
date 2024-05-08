@@ -34,7 +34,7 @@ class Client():
 
         # message bar
         my_msg = tkt.StringVar()
-        my_msg.set("Scrivi...")
+        my_msg.set("Inserisci il tuo nome")
 
         # msg list with scrollbar
         scrollbar = tkt.Scrollbar(messages_frame)
